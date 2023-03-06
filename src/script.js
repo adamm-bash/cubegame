@@ -14,12 +14,10 @@ const scene = new THREE.Scene()
 /**
  * Base
  */
-const axesHelper = new THREE.AxesHelper( 5 );
-scene.add( axesHelper );
 const gridHelper = new THREE.GridHelper(20, 20);
 scene.add( gridHelper );
 const geometry = new THREE.BoxGeometry(1, 1, 1)
-const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+const material = new THREE.MeshBasicMaterial({ color: 0x77dd77 })
 const mainc = new THREE.Mesh(geometry, material)
 mainc.position.set(0, 0, 0)
 scene.add(mainc)
@@ -74,7 +72,7 @@ class enemy {
 
         }
         const geometry = new THREE.BoxGeometry(1, 1, 1)
-        const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+        const material = new THREE.MeshBasicMaterial({ color: 0xffff00 })
         this.enemyBox = new THREE.Mesh(geometry, material)
 
         this.isDead = false
@@ -105,7 +103,8 @@ class enemy {
     }
 
 }
-
+let duration = 2;
+let score = 0;
 function createEnemy(side)
 {
     let newEn = new enemy(side)
@@ -127,19 +126,21 @@ function tick()
 function attack(enemy)
 {
 
-gsap.to(enemy.getPhysicalForm().position, {duration: 2, delay: 0, x: enemy.getTempPos(), 
+gsap.to(enemy.getPhysicalForm().position, {duration: duration, delay: 0, x: enemy.getTempPos(), 
     onComplete()
     {
-        enemy.getPhysicalForm().material.color.setHex(0x0000ff)
-        gsap.to(enemy.getPhysicalForm().position, {duration: 2, delay: 0, x: enemy.getFinalPos(), 
+        duration -= 0.05
+        enemy.getPhysicalForm().material.color.setHex(0xff0000)
+        gsap.to(enemy.getPhysicalForm().position, {duration: duration/2, delay: 0, x: enemy.getFinalPos(), 
         onComplete()
         {
             console.log(enemy.areTheyDead())
             if(enemy.areTheyDead() == false)
             {
                 playerDead = true
-                document.getElementById("cont1").style.visibility="hidden";
-                document.getElementById("cont2").style.visibility="visible";             }
+                document.getElementById("gg").innerHTML = "Game Over";
+                document.getElementById("score").innerHTML = "Score: " + score;  
+            }
             else
             {
                 let newRand = Math.floor((Math.random() * 2) + 1)
@@ -154,6 +155,7 @@ gsap.to(enemy.getPhysicalForm().position, {duration: 2, delay: 0, x: enemy.getTe
             gsap.killTweensOf(enemy.getPhysicalForm().position)
             enemy.getPhysicalForm().parent.remove(enemy.getPhysicalForm())
             enemy.kill();
+            score += 100;
             let newRand = Math.floor((Math.random() * 2) + 1)
             console.log(newRand)
             attack(createEnemy(newRand))
